@@ -94,9 +94,6 @@
     <EmbeddedResource Include="Properties\WebRtcWrapper.rd.xml" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Org.WebRtc" Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-      <HintPath>$(ProjectDir)..\..\..\Libraries\WebRTCUWP\Org.WebRtc\x64\Debug\Org.WebRtc.winmd</HintPath>
-    </Reference>
     <Reference Include="Org.WebRtc" Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
       <HintPath>$(ProjectDir)..\..\..\Libraries\WebRTCUWP\Org.WebRtc\x86\Release\Org.WebRtc.winmd</HintPath>
     </Reference>
