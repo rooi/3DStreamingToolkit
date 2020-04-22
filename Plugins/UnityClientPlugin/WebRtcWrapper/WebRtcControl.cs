@@ -868,8 +868,10 @@ namespace WebRtcWrapper
                         if (_selfVideoTrack != null)
                         {                            
                             OnStatusMessageUpdate?.Invoke("Enabling video loopback");
+
                             var source = Media.CreateMedia().CreateMediaSource(
-                                _selfVideoTrack, "SELF", "media");
+                                _selfVideoTrack, "media");
+
                             RunOnUiThread(() =>
                             {
                                 // TODO: Setup Local Video Display
@@ -1320,9 +1322,9 @@ namespace WebRtcWrapper
             }
         }
 
-        #endregion
+#endregion
 
-        #region UTILITY METHODS
+#region UTILITY METHODS
         private void ReevaluateHasServer()
         {
 			HasServer = this.Uri.Valid;
@@ -1332,6 +1334,6 @@ namespace WebRtcWrapper
         {
             var asyncOp = _uiDispatcher.RunAsync(CoreDispatcherPriority.Normal, new DispatchedHandler(fn));
         }
-        #endregion
+#endregion
     }
 }

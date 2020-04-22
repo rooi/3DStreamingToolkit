@@ -1,9 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM">
+      <Configuration>Release</Configuration>
+      <Platform>ARM</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|x64">
       <Configuration>Release</Configuration>
@@ -24,7 +32,20 @@
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
@@ -40,7 +61,15 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="Unity.props" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="Unity.props" />
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="Unity.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="Unity.props" />
   </ImportGroup>
@@ -52,7 +81,15 @@
     <LinkIncremental>true</LinkIncremental>
     <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <LinkIncremental>true</LinkIncremental>
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <LinkIncremental>false</LinkIncremental>
     <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
   </PropertyGroup>
@@ -65,6 +102,45 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>DEBUG;NOMINMAX;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <DisableSpecificWarnings>4100</DisableSpecificWarnings>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>nvpipe.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/ignore:4217,4049</AdditionalOptions>
+      <ModuleDefinitionFile>.\StreamingUnityServerPlugin.def</ModuleDefinitionFile>
+    </Link>
+    <PostBuildEvent>
+      <Command>
+      SETLOCAL
+      set TARGET_PLUGIN_PATH=$(ProjectDir)..\..\Samples\Server\Unity-FractalStream\Assets\
+
+      echo Target Plugin Path is %TARGET_PLUGIN_PATH%
+
+      mkdir "%TARGET_PLUGIN_PATH%Plugins"
+      mkdir "%TARGET_PLUGIN_PATH%Plugins\$(PlatformShortName)"
+      mkdir "%TARGET_PLUGIN_PATH%Plugins\$(PlatformShortName)\StreamingServer"
+
+      xcopy /y $(OutDir)*.dll "%TARGET_PLUGIN_PATH%Plugins\$(PlatformShortName)\StreamingServer"
+      xcopy /y $(OutDir)*.pdb "%TARGET_PLUGIN_PATH%Plugins\$(PlatformShortName)\StreamingServer"
+      xcopy /y $(OutDir)*.json "%TARGET_PLUGIN_PATH%Plugins"
+      xcopy /y /d  "$(ProjectDir)..\..\Libraries\Nvpipe\$(PlatformShortName)\$(Configuration)\nvpipe.dll" "%TARGET_PLUGIN_PATH%Plugins\$(PlatformShortName)\StreamingServer"
+      xcopy /y /d  "$(ProjectDir)..\..\Libraries\Nvpipe\$(PlatformShortName)\nvToolsExt64_1.dll" "%TARGET_PLUGIN_PATH%Plugins\$(PlatformShortName)\StreamingServer"
+      xcopy /y /d  "$(ProjectDir)..\..\Libraries\Nvpipe\$(PlatformShortName)\cudart64_91.dll" "%TARGET_PLUGIN_PATH%Plugins\$(PlatformShortName)\StreamingServer"
+      ENDLOCAL
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -144,14 +220,61 @@
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NOMINMAX;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;NDEBUG;_WINDOWS;_USRDLL;ARFUNITYMRT_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <DisableSpecificWarnings>4100</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>nvpipe.lib; %(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/ignore:4217,4049</AdditionalOptions>
+      <ModuleDefinitionFile>.\StreamingUnityServerPlugin.def</ModuleDefinitionFile>
+    </Link>
+    <PostBuildEvent>
+      <Command>      SETLOCAL
+      set TARGET_PLUGIN_PATH=$(ProjectDir)..\..\Samples\Server\Unity-FractalStream\Assets\
+
+      echo Target Plugin Path is %TARGET_PLUGIN_PATH%
+
+      mkdir "%TARGET_PLUGIN_PATH%Plugins"
+      mkdir "%TARGET_PLUGIN_PATH%Plugins\$(PlatformShortName)"
+      mkdir "%TARGET_PLUGIN_PATH%Plugins\$(PlatformShortName)\StreamingServer"
+      xcopy /y /d  "$(ProjectDir)..\..\Libraries\Nvpipe\$(PlatformShortName)\$(Configuration)\nvpipe.dll" "%TARGET_PLUGIN_PATH%Plugins\$(PlatformShortName)\StreamingServer" 
+      xcopy /y /d  "$(ProjectDir)..\..\Libraries\Nvpipe\$(PlatformShortName)\nvToolsExt64_1.dll" "%TARGET_PLUGIN_PATH%Plugins\$(PlatformShortName)\StreamingServer"
+      xcopy /y /d  "$(ProjectDir)..\..\Libraries\Nvpipe\$(PlatformShortName)\cudart64_91.dll" "%TARGET_PLUGIN_PATH%Plugins\$(PlatformShortName)\StreamingServer"      
+      xcopy /y "$(OutDir)*.dll" "%TARGET_PLUGIN_PATH%Plugins\$(PlatformShortName)\StreamingServer"
+      xcopy /y "$(OutDir)*.pdb" "%TARGET_PLUGIN_PATH%Plugins\$(PlatformShortName)\StreamingServer"
+      xcopy /y "$(OutDir)*.json" "%TARGET_PLUGIN_PATH%Plugins"
+      ENDLOCAL
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="StreamingUnityServerPlugin.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsManaged>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">false</CompileAsManaged>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+      </PrecompiledHeader>
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</CompileAsManaged>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">false</CompileAsManaged>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
       </PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
